@@ -1,0 +1,252 @@
+<html>
+
+  <head>
+
+    <meta charset="UTF-8">
+
+    <title>Flash 暗算</title>
+
+    <style type="text/css">
+    html {
+        font-size: 62.5%;
+        text-align: center;
+    }
+
+    h1 {
+        font-size: 4rem;
+    }
+
+    #canvas-area {
+        width: 500px;
+        height: 500px;
+        margin: 0 auto;
+        overflow: hidden;
+    }
+
+    /* solid002 */
+    .button_solid002 a {
+        position: relative;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        margin: 0 auto;
+        max-width: 240px;
+        padding: 10px 25px;
+        color: #FFF;
+        transition: 0.3s ease-in-out;
+        font-weight: 600;
+        background: #6bb6ff;
+        filter: drop-shadow(0px 2px 4px #ccc);
+        border-radius: 3px;
+        border-radius: 50px;
+    }
+    .button_solid002 a:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 30px -5px rgb(0 0 0 / 15%), 0 0 5px rgb(0 0 0 / 10%);
+    }
+
+  </style>
+
+  </head>
+
+  <body>
+
+    <div id="main" style="display: block;">
+        <h1>フラッシュ暗算</h1>
+        <canvas id="canvas-area"></canvas><br>
+        <br>
+        <div class="button_solid002">
+            <a href="#" id="start_button">スタート！！</a>
+        </div>
+        <br>
+        <label style="font-size: xx-large;">答え: </label><input type="number" id="answer" style="width: 200px; height: 60px; font-size: xx-large; ime-mode: inactive;" onkeypress="return event.charCode>=48 && event.charCode<=57">
+        <button id="retry_button">再回答</button>
+        <button id="show_button">答え表示</button>
+        <button id="config_button">設定</button>
+    </div>
+    <div id="config" style="display: none;">
+        <h1>フラッシュ暗算 - 設定</h1>
+        桁数: 
+        <select id="digit_selecter">
+            <option value="1">一桁</option>
+            <option value="2" selected>二桁</option>
+            <option value="3">三桁</option>
+            <option value="4">四桁</option>
+        </select><br>
+        <br>
+        口数:
+        <select id="repeat_selecter">
+            <option value="2">二口</option>  
+            <option value="3" selected>三口</option> 
+            <option value="4">四口</option>
+            <option value="5">五口</option>
+            <option value="6">六口</option>
+            <option value="7">七口</option>
+            <option value="8">八口</option>
+            <option value="9">九口</option>
+            <option value="10">十口</option>
+            <option value="15">十五口</option>
+            <option value="30">三十口</option>              
+        </select><br>
+        <br>
+        <input type="text"id="second_selecter" value="3"><br>
+        <br>
+        <div class="button_solid002">
+            <a href="#" id="back_button">戻る</a>
+        </div>
+    </div>
+    <script type="text/javascript">
+
+      // キャンバスを取得
+      const canvas = document.getElementById('canvas-area');
+
+      //キャンバスのサイズを取得
+      const width = canvas.clientWidth;
+      const height = canvas.clientHeight;
+
+      //キャンバスのサイズ(CSSで指定したキャンバスのサイズをキャンバス内に反映)
+      canvas.width = 500;
+      canvas.height = 500;
+
+      //キャンバスの背景の色
+      canvas.style.backgroundColor = "rgb(0,0,0)";
+
+      //描画コンテキストの取得
+      const context = canvas.getContext('2d');
+
+      //-----------------
+      // 設定
+      //-----------------
+
+      // 桁数
+      let digit = 2;
+      // その桁数での最小値
+      let min = 10 ** (digit - 1);
+      // その桁数での最大値
+      let max = 10 ** digit - 1;
+
+      // 口数
+      let repeat = 3;
+      let time = repeat;
+
+      // 秒数
+      let second = 3;
+      let waitTimeMs = (second * 1000) / repeat;
+
+      let result = 0;
+      let previousValue = NaN;
+
+      // テキスト設定
+      const font_px = 220;
+      const font_color = "lime";
+      context.font = `${font_px}px 'ＭＳ ゴシック'`;
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+
+      // 音声認識
+      SpeechRecognition = webkitSpeechRecognition || SpeechRecognition;
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'ja';
+      recognition.onresult = (event) => {
+        const answerText = event.results[0][0].transcript;
+        document.getElementById('answer').value = answerText;
+        verifyAnswer(answerText);
+      }
+
+      document.getElementById("start_button").addEventListener('click', (e) => {
+        time = repeat;
+        result = 0;
+        previousValue = NaN;
+        clear();
+        setTimeout(flash, 1000);
+      });
+
+      document.getElementById("config_button").addEventListener('click', (e) => {
+        document.getElementById("main").style = "display: none;"
+        document.getElementById("config").style = "display: block;"
+      });
+
+      document.getElementById("digit_selecter").addEventListener('change', (e) => {
+        digit = parseInt(e.target.value);
+        // その桁数での最小値
+        min = 10 ** (digit - 1);
+        // その桁数での最大値
+        max = 10 ** digit - 1;
+      });
+
+      document.getElementById("repeat_selecter").addEventListener('change', (e) => {
+        // 口数
+        repeat = parseInt(e.target.value);
+        time = repeat;
+      });
+      document.getElementById("second_selecter").addEventListener('change', (e) => {
+        second = parseInt(e.target.value);
+        waitTimeMs = (second * 1000) / repeat;
+      });
+
+       
+
+      document.getElementById("back_button").addEventListener('click', (e) => {
+        document.getElementById("main").style = "display: block;"
+        document.getElementById("config").style = "display: none;"
+      });
+
+      function clear() {
+        // 数字をクリア
+        context.beginPath();
+        context.fillStyle = canvas.style.backgroundColor;
+        context.rect(0, height / 2 - ((font_px + 40) / 2), width, font_px + 40);
+        context.fill();
+      }
+
+      function flash() {
+        document.getElementById('answer').value = '';
+        document.getElementById('answer').disabled = true;
+        clear();
+
+        // 数値取得
+        let value = random();
+        result += value;
+
+        // 数値を表示する
+        context.fillStyle = font_color;
+        context.fillText(value, width / 2, height / 2);
+
+        time--;
+        if(time > 0) {
+          setTimeout(flash, waitTimeMs);
+        } else {
+          document.getElementById('answer').disabled = false;
+          document.getElementById('answer').focus();
+          recognition.start();
+        }
+      }
+
+      function random() {
+        const value = Math.floor( Math.random() * (max + 1 - min) ) + min;
+        if(value !== previousValue) {
+          previousValue = value;
+          return value;
+        } else {
+         return random();
+        }
+      }
+
+      function verifyAnswer(answerText) {
+        if(result === parseInt(answerText)) {
+          clear();
+          context.fillStyle = font_color;
+          context.fillText("◎", width / 2, height / 2);
+        }
+      }
+
+      document.getElementById('answer').addEventListener('keyup', e => {
+        verifyAnswer(e.target.value);
+      });
+
+    </script>
+
+  </body>
+
+</html>
+ 
