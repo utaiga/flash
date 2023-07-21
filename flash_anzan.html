@@ -60,7 +60,6 @@
         </div>
         <br>
         <label style="font-size: xx-large;">答え: </label><input type="number" id="answer" style="width: 200px; height: 60px; font-size: xx-large; ime-mode: inactive;" onkeypress="return event.charCode>=48 && event.charCode<=57">
-        <button id="retry_button">再回答</button>
         <button id="show_button">答え表示</button>
         <button id="config_button">設定</button>
     </div>
@@ -152,12 +151,18 @@
         document.getElementById('answer').value = answerText;
       };
       recognition.onend = (event) => {
-        if(!isCorrectAnswer(document.getElementById('answer').value)) {
+        if(isCorrectAnswer(document.getElementById('answer').value)) {
+          document.getElementById('answer').disabled = true;
+        } else if(!document.getElementById('answer').disabled) {
+          // answerがdisabledではない、つまり回答中の時は音声認識を再開
           recognition.start();
         }
       };
 
       document.getElementById("start_button").addEventListener('click', (e) => {
+        document.getElementById('answer').value = '';
+        document.getElementById('answer').disabled = true;
+        clear();
         recognition.abort();
         time = repeat;
         result = 0;
@@ -205,8 +210,6 @@
       }
 
       function flash() {
-        document.getElementById('answer').value = '';
-        document.getElementById('answer').disabled = true;
         clear();
 
         // 数値取得
