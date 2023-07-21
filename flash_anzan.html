@@ -150,10 +150,15 @@
       recognition.onresult = (event) => {
         const answerText = event.results[0][0].transcript;
         document.getElementById('answer').value = answerText;
-        verifyAnswer(answerText);
-      }
+      };
+      recognition.onend = (event) => {
+        if(!isCorrectAnswer(document.getElementById('answer').value)) {
+          recognition.start();
+        }
+      };
 
       document.getElementById("start_button").addEventListener('click', (e) => {
+        recognition.abort();
         time = repeat;
         result = 0;
         previousValue = NaN;
@@ -232,16 +237,16 @@
         }
       }
 
-      function verifyAnswer(answerText) {
-        if(result === parseInt(answerText)) {
-          clear();
-          context.fillStyle = font_color;
-          context.fillText("◎", width / 2, height / 2);
-        }
+      function isCorrectAnswer(answerText) {
+        if(result !== parseInt(answerText)) return false;
+        clear();
+        context.fillStyle = font_color;
+        context.fillText("◎", width / 2, height / 2);
+        return true;
       }
 
       document.getElementById('answer').addEventListener('keyup', e => {
-        verifyAnswer(e.target.value);
+        isCorrectAnswer(e.target.value);
       });
 
     </script>
