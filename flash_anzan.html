@@ -171,6 +171,10 @@
         setTimeout(flash, 1000);
       });
 
+      document.getElementById("show_button").addEventListener('click', (e) => {
+        chanco();
+      });
+
       document.getElementById("config_button").addEventListener('click', (e) => {
         document.getElementById("main").style = "display: none;"
         document.getElementById("config").style = "display: block;"
@@ -223,7 +227,6 @@
           setTimeout(flash, waitTimeMs);
         } else {
           document.getElementById('answer').disabled = false;
-          // document.getElementById('answer').focus();
           recognition.start();
         }
       }
@@ -237,9 +240,23 @@
          return random();
         }
       }
+      
+      function chanco(){
+        clear();
+        context.fillStyle = font_color;
+        context.fillText(result, width / 2, height / 2);
+        
+        document.getElementById('answer').disabled = true;
+        recognition.abort();
+      }
 
       function isCorrectAnswer(answerText) {
         if(result !== parseInt(answerText)) return false;
+
+        //----------
+        // 正解！
+        //----------
+
         clear();
         context.fillStyle = font_color;
         context.fillText("◎", width / 2, height / 2);
@@ -247,7 +264,10 @@
       }
 
       document.getElementById('answer').addEventListener('keyup', e => {
-        isCorrectAnswer(e.target.value);
+        if(isCorrectAnswer(e.target.value)) {
+          document.getElementById('answer').disabled = true;
+          recognition.abort();
+        }
       });
 
     </script>
