@@ -62,9 +62,21 @@
         <label style="font-size: xx-large;">答え: </label><input type="number" id="answer" style="width: 200px; height: 60px; font-size: xx-large; ime-mode: inactive;" onkeypress="return event.charCode>=48 && event.charCode<=57">
         <button id="show_button">答え表示</button>
         <button id="config_button">設定</button>
+        <button id="QR_button">QRコード</button>  
     </div>
     <div id="config" style="display: none;">
         <h1>フラッシュ暗算 - 設定</h1>
+        <h2>レベル:</h2>
+        <select id="level_selecter">
+          <option value="Lv1">初級</option>
+          <option value="Lv2">中級</option>
+          <option value="Lv3">上級</option>
+          <option value="Lv4">超上級</option>
+          <option value="Lv5">最上級</option>
+          <option value="Lv6">世界記録</option>
+        </select>
+        <br>
+        <h2>細かく設定:</h2>
         桁数: 
         <select id="digit_selecter">
             <option value="1">一桁</option>
@@ -94,8 +106,16 @@
             <a id="back_button">戻る</a>
         </div>
     </div>
+    <div id="QR" style="display: none;">
+        <div>
+          <h1>フラッシュ暗算-QRコード</h1>
+          <img src="./qr4flash.png" width="500px">
+          <div class="button_solid002">
+            <a id="back_button2">戻る</a>
+          </div>
+        </div>
+    </div>
     <script type="text/javascript">
-
       // キャンバスを取得
       const canvas = document.getElementById('canvas-area');
 
@@ -179,6 +199,10 @@
         document.getElementById("main").style = "display: none;"
         document.getElementById("config").style = "display: block;"
       });
+      document.getElementById("QR_button").addEventListener('click', (e) => {
+        document.getElementById("main").style = "display: none;"
+        document.getElementById("QR").style = "display: block;"
+      });
 
       document.getElementById("digit_selecter").addEventListener('change', (e) => {
         digit = parseInt(e.target.value);
@@ -198,11 +222,53 @@
         waitTimeMs = (second * 1000) / repeat;
       });
 
+      document.getElementById("level_selecter").addEventListener('change', (e) => {
+        switch(e.target.value) {
+          case "Lv1":
+            applyLevel(1, 5, 7);
+            break;
+            case "Lv2":
+            applyLevel(2, 15, 13);
+            break;
+            case "Lv3":
+            applyLevel(3, 4, 4);
+            break;
+            case "Lv4":
+            applyLevel(3, 10, 7);
+            break;
+            case "Lv5":
+            applyLevel(3, 15, 3);
+            break;
+          case "Lv6":
+            applyLevel(3, 15, 1.62);
+            break;
+        }
+      });
+
+      function applyLevel(d, r, s) {
+        document.getElementById("digit_selecter").value = d;
+        document.getElementById("repeat_selecter").value = r;
+        document.getElementById("second_selecter").value = s;
+
+        digit = d;
+        min = 10 ** (digit - 1);
+        max = 10 ** digit - 1;
+
+        repeat = r;
+        time = repeat;
+
+        second = s;
+        waitTimeMs = (second * 1000) / repeat;
+      }
+
       document.getElementById("back_button").addEventListener('click', (e) => {
         document.getElementById("main").style = "display: block;"
         document.getElementById("config").style = "display: none;"
       });
-
+      document.getElementById("back_button2").addEventListener('click', (e) => {
+        document.getElementById("main").style = "display: block;"
+        document.getElementById("QR").style = "display: none;"
+      });
       function clear() {
         // 数字をクリア
         context.beginPath();
@@ -245,7 +311,7 @@
         clear();
         context.fillStyle = font_color;
         context.fillText(result, width / 2, height / 2);
-        
+
         document.getElementById('answer').disabled = true;
         recognition.abort();
       }
