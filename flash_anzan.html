@@ -68,12 +68,14 @@
         <h1>フラッシュ暗算 - 設定</h1>
         <h2>レベル:</h2>
         <select id="level_selecter">
-          <option value="Lv1">初級</option>
-          <option value="Lv2">中級</option>
-          <option value="Lv3">上級</option>
-          <option value="Lv4">超上級</option>
-          <option value="Lv5">最上級</option>
-          <option value="Lv6">世界記録</option>
+          <option value = 'lv0'>超初級</option>
+          <option value = "Lv1">初級</option>
+          <option value = "Lv2">中級</option>
+          <option value = "Lv3">上級</option>
+          <option value = "Lv4">超上級</option>
+          <option value = "Lv5">最上級</option>
+          <option value = "Lv6">十段</option>
+          <option value = "WR">世界記録</option>
         </select>
         <br>
         <h2>細かく設定:</h2>
@@ -224,22 +226,34 @@
 
       document.getElementById("level_selecter").addEventListener('change', (e) => {
         switch(e.target.value) {
-          case "Lv1":
+            //超初級
+            case "Lv0":
+            applyLevel(1, 3, 5);
+            //初級
+            case "Lv1":
             applyLevel(1, 5, 7);
             break;
+            //中級
             case "Lv2":
+            applyLevel(2, 5, 7);
+            break;
+            //上級
+            case "Lv3":
+            applyLevel(2, 10, 7);
+            break;
+            //超上級
+            case "Lv4":
             applyLevel(2, 15, 13);
             break;
-            case "Lv3":
-            applyLevel(3, 4, 4);
-            break;
-            case "Lv4":
+            //最上級
+            case "Lv5":
             applyLevel(3, 10, 7);
             break;
-            case "Lv5":
+            //十段
+            case "lv6":
             applyLevel(3, 15, 3);
-            break;
-          case "Lv6":
+            //世界記録
+            case "WR":
             applyLevel(3, 15, 1.62);
             break;
         }
