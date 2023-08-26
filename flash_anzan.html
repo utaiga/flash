@@ -4,6 +4,10 @@
 
     <meta charset="UTF-8">
 
+    <audio id="seikai" preload="auto">
+      <source src = "./correct1.mp3" type = 'audio/mp3'>
+    </audio>
+
     <title>Flash 暗算</title>
 
     <style type="text/css">
@@ -139,19 +143,29 @@
       // 設定
       //-----------------
 
+      // 値を「tiger」をキーとして、保存
+      localStorage.setItem('tiger', 'chanko');
+
+      // 「tiger」をキーとして保存した値を取得して表示
+      console.log(localStorage.getItem('tiger'));
+
+      // localStorage.setItem('digit', 3);
+
       // 桁数
-      let digit = 2;
+      let digit = localStorage.getItem('digit') || 2;
+
+
       // その桁数での最小値
       let min = 10 ** (digit - 1);
       // その桁数での最大値
       let max = 10 ** digit - 1;
 
       // 口数
-      let repeat = 3;
+      let repeat = localStorage.getItem('repeat') || 3;
       let time = repeat;
 
       // 秒数
-      let second = 3;
+      let second = localStorage.getItem('second') || 3;
       let waitTimeMs = (second * 1000) / repeat;
 
       let result = 0;
@@ -208,6 +222,7 @@
 
       document.getElementById("digit_selecter").addEventListener('change', (e) => {
         digit = parseInt(e.target.value);
+        localStorage.setItem('digit', digit);
         // その桁数での最小値
         min = 10 ** (digit - 1);
         // その桁数での最大値
@@ -217,10 +232,12 @@
       document.getElementById("repeat_selecter").addEventListener('change', (e) => {
         // 口数
         repeat = parseInt(e.target.value);
+        localStorage.setItem('repeat', repeat);
         time = repeat;
       });
       document.getElementById("second_selecter").addEventListener('change', (e) => {
         second = parseInt(e.target.value);
+        localStorage.setItem('second', second);
         waitTimeMs = (second * 1000) / repeat;
       });
 
@@ -251,7 +268,7 @@
               applyLevel(3, 10, 7);
               break;
             //十段
-            case "lv6":
+            case "Lv6":
               applyLevel(3, 15, 3);
               break;
             //世界記録
@@ -269,12 +286,15 @@
         digit = d;
         min = 10 ** (digit - 1);
         max = 10 ** digit - 1;
+        localStorage.setItem('digit', digit);
 
         repeat = r;
         time = repeat;
+        localStorage.setItem('repeat', repeat);
 
         second = s;
         waitTimeMs = (second * 1000) / repeat;
+        localStorage.setItem('second', second);
       }
 
       document.getElementById("back_button").addEventListener('click', (e) => {
@@ -349,6 +369,7 @@
         if(isCorrectAnswer(e.target.value)) {
           document.getElementById('answer').disabled = true;
           recognition.abort();
+          // setTimeout(() => {document.getElementById('seikai').play()}, 1000);
         }
       });
 
