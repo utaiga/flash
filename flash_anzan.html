@@ -202,7 +202,7 @@
       });
 
       document.getElementById("show_button").addEventListener('click', (e) => {
-        chanco();
+        showAnswer();
       });
 
       document.getElementById("config_button").addEventListener('click', (e) => {
@@ -344,7 +344,7 @@
         }
       }
       
-      function chanco(){
+      function showAnswer(){
         clear();
         context.fillStyle = font_color;
         context.fillText(result, width / 2, height / 2);
